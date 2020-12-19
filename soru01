@@ -1,0 +1,23 @@
+import re
+
+def hepsiASCIIMi(dizge):
+    return all(ord(k) < 128 for k in dizge)
+
+def eMailGecerliMi(adres):
+    if re.match("\A(?P<name>[\w\-_]+)@(?P<domain>[\w\-_]+).(?P<toplevel>[\w]+)\Z", adres, re.IGNORECASE):
+        if (hepsiASCIIMi(adres)):
+            return True
+        else:
+            return False
+    return False
+
+def main():
+    email = input ("Lütfen bir e-mail adresi giriniz: ")
+
+    if (eMailGecerliMi(email)):
+        print('Bu geçerli bir e-mail adresidir')
+    else:
+        print('Bu geçerli bir e-mail adresi değildir')
+
+if __name__ == "__main__":
+    main()
