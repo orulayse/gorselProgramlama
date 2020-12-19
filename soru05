@@ -1,0 +1,98 @@
+from io import StringIO
+
+def koduCoz(kod):
+    KodCozum = StringIO()
+    KodCozum.writelines("\n")
+    Kodislem = 0
+    if (kod.count("receive") == 0 and kod.count("send") == 0): #hatalı kod
+        return
+    ilkayrıstırma = kod.split("\n")
+    for x in ilkayrıstırma:
+        ayrıstırma2 = x.split("-")
+        Kodislem += 1
+        KodHata = koduCozYaz(ayrıstırma2,KodCozum,Kodislem)
+        if (KodHata == False):
+            continue  
+
+    print(KodCozum.getvalue())        
+    
+def koduCozYaz(kod,KodCozum,Kodislem):
+    if (kod[0] == "send"):
+        if (len(kod) == 5):
+            if (Kodislem > 1):
+                KodCozum.writelines("------\n")
+            KodCozum.writelines("Kod Tipi : send - Giden\n")
+            Sinyal(kod[1],KodCozum)
+            Cihaz(kod[2],KodCozum)
+            Durum(kod[3],KodCozum)
+            Cevap(kod[4],KodCozum)
+            return True
+    if (kod[0] == "receive"):
+        if (len(kod) == 4):
+            if (Kodislem > 1):
+                KodCozum.writelines("------\n")
+            KodCozum.writelines("Kod Tipi : receive - Gelen\n")
+            Sinyal(kod[1],KodCozum)
+            Cihaz(kod[2],KodCozum)
+            Durum(kod[3],KodCozum)
+            return True
+    else:
+        if (kod[0] == ""):
+            return True #kod yok...
+        KodCozum.truncate(0)
+        KodCozum.seek(0)
+        KodCozum.writelines("Error : %d. Bölüm Hatalı\n" %(Kodislem))
+        KodCozum.writelines("------\n")
+        KodCozum.writelines("Error : send ya da receive icermiyor\n")
+        return False
+    
+
+def Sinyal(kod,KodCozum):
+    if (int(kod) < 51 and int(kod) >= 0):
+        KodCozum.writelines("Sinyal Gucu : %d - Çok Zayıf Sinyal\n" %(int(kod)))
+        return
+    if (int(kod) < 101 and int(kod) > 50):
+        KodCozum.writelines("Sinyal Gucu : %d - Zayıf Sinyal\n" %(int(kod)))
+        return
+    if (int(kod) < 151 and int(kod) > 100):
+        KodCozum.writelines("Sinyal Gucu : %d - Orta Sinyal\n" %(int(kod)))
+        return
+    if (int(kod) < 201 and int(kod) > 150):
+        KodCozum.writelines("Sinyal Gucu : %d - Guçlu Sinyal\n" %(int(kod)))
+        return
+    if (int(kod) < 256 and int(kod) > 200):
+        KodCozum.writelines("Sinyal Gucu : %d - Çok Guçlu Sinyal\n" %(int(kod)))
+        return
+    else:
+        KodCozum.writelines("Sinyal Gucu : %d - Bilinmeyen Sinyal\n" %(int(kod)))    
+
+def Cihaz(kod,KodCozum):
+    switchcihaz ={
+                1:"Cihaz : 1 - Televizyon\n",
+                2:"Cihaz : 2 - Camasir Makinesi\n",
+                3:"Cihaz : 3 - Buzdolabi\n",
+                4:"Cihaz : 4 - Firin\n",
+             }
+    KodCozum.writelines(switchcihaz.get(int(kod),"Cihaz : %d - Bilinmeyen\n" %(int(kod))))    
+
+def Durum(kod,KodCozum):
+    switchdurum ={
+                0:"Durumu : 0 - Off\n",
+                1:"Durumu : 1 - On\n"
+    }
+    KodCozum.writelines(switchdurum.get(int(kod),"Durumu : %d - Bilinmeyen\n" %(int(kod))))
+
+def Cevap(kod,KodCozum):
+    switchcevap ={
+                0:"Cevap : 0 - Istenmiyor\n",
+                1:"Cevap : 1 - Isteniyor\n"
+    }
+    KodCozum.writelines(switchcevap.get(int(kod),"Cevap : %d - Bilinmeyen\n" %(int(kod))))
+
+
+
+
+koduCoz("receive-23-1-0\n")
+koduCoz("send-181-3-0-1\nreceive-170-3-0\n")
+koduCoz("receive-150-0-1\n0-4-5-6-\n")
+
